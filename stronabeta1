@@ -1,0 +1,129 @@
+<html>
+<head>
+    <title>Kalkulator zużycia energii</title>
+</head>
+<style>
+    /* ustawienie koloru tła */
+    body {
+        background-color: #F5F5F5;
+    }
+
+    /* ustawienie wyglądu nagłówka */
+    h1 {
+        text-align: center;
+        color: #8B8B8B;
+    }
+
+    /* ustawienie wyglądu formularza */
+    form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    /* ustawienie wyglądu pól tekstowych */
+    input[type="number"] {
+        width: 50%;
+        padding: 12px 20px;
+        margin: 8px 0;
+        box-sizing: border-box;
+        border: 1px solid #C9C9C9;
+        border-radius: 4px;
+    }
+
+    /* ustawienie wyglądu przycisku */
+    input[type="submit"] {
+        width: 50%;
+        background-color: #8B8B8B;
+        color: white;
+        padding: 14px 20px;
+        margin: 8px 0;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    /* ustawienie wyglądu tabeli */
+    table {
+        width: 80%;
+        text-align: center;
+        margin: 30px auto;
+        border-collapse: collapse;
+    }
+
+    /* ustawienie wyglądu nagłówków tabeli */
+    th {
+        background-color: #8B8B8B;
+        color: white;
+        padding: 12px;
+    }
+
+    /* ustawienie wyglądu wierszy tabeli */
+    td, th {
+        border: 1px solid #C9C9C9;
+        padding: 12px;
+    }
+
+</style>
+
+<body>
+    <h1>Kalkulator zużycia energii</h1>
+    <form name="energyForm">
+        Stan licznika głównego: <input type="number" name="mainMeterReading"><br>
+        Stan licznika podwykonawcy 1: <input type="number" name="subcontractorMeterReading1"><br>
+        Stan licznika podwykonawcy 2: <input type="number" name="subcontractorMeterReading2"><br>
+        Kwota energii na fakturze: <input type="number" name="energyBillAmount"><br>
+        <input type="submit" value="Oblicz koszt" onclick="return calculateCost()">
+    </form> 
+    <br>
+    <table>
+        <tr>
+            <th>Data</th>
+            <th>Ilość KWh podwykonawca 1</th>
+            <th>Ilość KWh podwykonawca 2</th>
+            <th>Ilość KWh podwykonawca suma</th>
+            <th>Cena</th>
+        </tr>
+        <tbody id="result">
+        </tbody>
+    </table>
+    <script>
+        let previousSubcontractorMeterReading1 = 0;
+        let previousSubcontractorMeterReading2 = 0;
+
+        function calculateCost() {
+            const mainMeterReading = parseInt(document.energyForm.mainMeterReading.value);
+            const subcontractorMeterReading1 = parseInt(document.energyForm.subcontractorMeterReading1.value);
+            const subcontractorMeterReading2 = parseInt(document.energyForm.subcontractorMeterReading2.value);
+            const energyBillAmount = parseFloat(document.energyForm.energyBillAmount.value);
+            
+            if (subcontractorMeterReading1 < previousSubcontractorMeterReading1 || subcontractorMeterReading2 < previousSubcontractorMeterReading2) {
+                alert("Wartość licznika nie może być mniejsza niż poprzednia!");
+	return false;
+}
+        const currentSubcontractor1Consumption = subcontractorMeterReading1 - previousSubcontractorMeterReading1;
+        const currentSubcontractor2Consumption = subcontractorMeterReading2 - previousSubcontractorMeterReading2;
+        const totalCurrentSubcontractorConsumption = currentSubcontractor1Consumption + currentSubcontractor2Consumption;
+        const unitCost = energyBillAmount / mainMeterReading;
+        const subcontractorCost = unitCost * totalCurrentSubcontractorConsumption;
+        const date = new Date().toLocaleDateString();
+
+        const resultRow = `
+            <tr>
+                <td>${date}</td>
+                <td>${currentSubcontractor1Consumption} KWh</td>
+                <td>${currentSubcontractor2Consumption} KWh</td>
+                <td>${totalCurrentSubcontractorConsumption} KWh</td>
+                <td>${subcontractorCost.toFixed(2)} PLN</td>
+            </tr>
+        `;
+
+        previousSubcontractorMeterReading1 = subcontractorMeterReading1;
+        previousSubcontractorMeterReading2 = subcontractorMeterReading2;
+        document.querySelector("#result").innerHTML += resultRow;
+        return false;
+    }
+</script>
+</body>
+</html>
+```
